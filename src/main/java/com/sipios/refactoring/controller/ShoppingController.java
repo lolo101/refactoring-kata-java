@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/shopping")
 public class ShoppingController {
@@ -19,29 +22,21 @@ public class ShoppingController {
 
     @PostMapping
     public String getPrice(@RequestBody Body b) {
-        double p = 0;
-
-        // Compute discount for customer
-        double clientDiscout = b.getType().discout();
-
-        if (b.getItems() == null) {
-            return "0";
-        }
-        // Compute total amount depending on the types and quantity of product and
-        // if we are in winter or summer discounts periods
-        boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
-        for (int i = 0; i < b.getItems().length; i++) {
-            Item it = b.getItems()[i];
-            p += it.getType().price(discountPeriod) * it.getNb() * clientDiscout;
-        }
-
         try {
-            b.getType().checkPriceLimit(p);
+            double itemsPrice = itemsPrice(b);
+            double finalPrice = b.getType().applyDiscount(itemsPrice);
+            b.getType().checkPriceLimit(finalPrice);
+            return String.valueOf(finalPrice);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
 
-        return String.valueOf(p);
+    private double itemsPrice(Body b) {
+        boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
+        return Arrays.stream(Optional.ofNullable(b.getItems()).orElse(new Item[0]))
+            .mapToDouble(it -> it.totalPrice(discountPeriod))
+            .sum();
     }
 }
 
@@ -100,5 +95,9 @@ class Item {
 
     public void setNb(int nb) {
         this.nb = nb;
+    }
+
+    public double totalPrice(boolean discountPeriod) {
+        return type.price(discountPeriod) * nb;
     }
 }

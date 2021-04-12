@@ -15,8 +15,8 @@ public enum ClientType {
         this.maximumPrice = maximumPrice;
     }
 
-    public double discout() {
-        return discount;
+    public double applyDiscount(double itemsPrice) {
+        return itemsPrice * discount;
     }
 
     public void checkPriceLimit(double p) throws Exception {
