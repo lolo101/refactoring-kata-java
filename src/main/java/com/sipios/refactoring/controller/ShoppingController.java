@@ -23,20 +23,12 @@ public class ShoppingController {
     @PostMapping
     public String getPrice(@RequestBody Body b) {
         try {
-            double itemsPrice = itemsPrice(b);
-            double finalPrice = b.getType().applyDiscount(itemsPrice);
-            b.getType().checkPriceLimit(finalPrice);
+            boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
+            double finalPrice = b.finalPrice(discountPeriod);
             return String.valueOf(finalPrice);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-    }
-
-    private double itemsPrice(Body b) {
-        boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
-        return Arrays.stream(Optional.ofNullable(b.getItems()).orElse(new Item[0]))
-            .mapToDouble(it -> it.totalPrice(discountPeriod))
-            .sum();
     }
 }
 
@@ -66,6 +58,18 @@ class Body {
 
     public void setType(ClientType type) {
         this.type = type;
+    }
+
+    public double finalPrice(boolean discountPeriod) throws Exception {
+        double itemsPrice = itemsPrice(discountPeriod);
+        double discountedPrice = type.applyDiscount(itemsPrice);
+        type.checkPriceLimit(discountedPrice);
+        return discountedPrice;
+    }
+    public double itemsPrice(boolean discountPeriod) {
+        return Arrays.stream(Optional.ofNullable(items).orElse(new Item[0]))
+            .mapToDouble(it -> it.totalPrice(discountPeriod))
+            .sum();
     }
 }
 
