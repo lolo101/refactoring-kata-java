@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import static com.sipios.refactoring.controller.ClientType.*;
+
 @RestController
 @RequestMapping("/shopping")
 public class ShoppingController {
@@ -21,22 +23,13 @@ public class ShoppingController {
     @PostMapping
     public String getPrice(@RequestBody Body b) {
         double p = 0;
-        double d;
 
         Date date = new Date();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(date);
 
         // Compute discount for customer
-        if (b.getType().equals("STANDARD_CUSTOMER")) {
-            d = 1;
-        } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-            d = 0.9;
-        } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-            d = 0.5;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        double d = b.getType().discout();
 
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods
@@ -92,15 +85,15 @@ public class ShoppingController {
         }
 
         try {
-            if (b.getType().equals("STANDARD_CUSTOMER")) {
+            if (b.getType() == STANDARD_CUSTOMER) {
                 if (p > 200) {
                     throw new Exception("Price (" + p + ") is too high for standard customer");
                 }
-            } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
+            } else if (b.getType() == PREMIUM_CUSTOMER) {
                 if (p > 800) {
                     throw new Exception("Price (" + p + ") is too high for premium customer");
                 }
-            } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
+            } else if (b.getType() == PLATINUM_CUSTOMER) {
                 if (p > 2000) {
                     throw new Exception("Price (" + p + ") is too high for platinum customer");
                 }
@@ -120,9 +113,9 @@ public class ShoppingController {
 class Body {
 
     private Item[] items;
-    private String type;
+    private ClientType type;
 
-    public Body(Item[] is, String t) {
+    public Body(Item[] is, ClientType t) {
         this.items = is;
         this.type = t;
     }
@@ -137,11 +130,11 @@ class Body {
         this.items = items;
     }
 
-    public String getType() {
+    public ClientType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ClientType type) {
         this.type = type;
     }
 }
