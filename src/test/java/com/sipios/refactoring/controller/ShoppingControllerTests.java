@@ -18,4 +18,11 @@ class ShoppingControllerTests extends UnitTest {
             () -> controller.getPrice(new Body(new Item[] {}, STANDARD_CUSTOMER))
         );
     }
+
+    @Test
+    void should_throw_on_price_limit_exceeded() {
+        Assertions.assertThrows(Exception.class,
+            () -> controller.getPrice(new Body(new Item[] {new Item("JACKET", 3)}, STANDARD_CUSTOMER))
+        );
+    }
 }
