@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import java.util.Calendar;
 
 import static com.sipios.refactoring.controller.ClientType.STANDARD_CUSTOMER;
 import static com.sipios.refactoring.controller.ItemType.JACKET;
@@ -14,6 +17,9 @@ class ShoppingControllerTests extends UnitTest {
 
     @InjectMocks
     private ShoppingController controller;
+
+    @Mock
+    private Calendar calendar;
 
     @Test
     void should_not_throw() {
