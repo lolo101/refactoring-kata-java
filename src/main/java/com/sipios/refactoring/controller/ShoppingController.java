@@ -7,18 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Calendar;
-
-import static com.sipios.refactoring.controller.ItemType.*;
-
 @RestController
 @RequestMapping("/shopping")
 public class ShoppingController {
 
-    private final Calendar cal;
+    private final DiscountPeriodService summerDiscountPeriod;
 
-    public ShoppingController(Calendar cal) {
-        this.cal = cal;
+    public ShoppingController(DiscountPeriodService summerDiscountPeriod) {
+        this.summerDiscountPeriod = summerDiscountPeriod;
     }
 
     @PostMapping
@@ -26,30 +22,17 @@ public class ShoppingController {
         double p = 0;
 
         // Compute discount for customer
-        double d = b.getType().discout();
+        double clientDiscout = b.getType().discout();
 
         if (b.getItems() == null) {
             return "0";
         }
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods
-        if (summerDiscountPeriod() || winterDiscountPeriod()) {
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
-
-                if (it.getType() == TSHIRT) {
-                    p += 30 * it.getNb() * d;
-                } else if (it.getType() == DRESS) {
-                    p += 50 * it.getNb() * 0.8 * d;
-                } else if (it.getType() == JACKET) {
-                    p += 100 * it.getNb() * 0.9 * d;
-                }
-            }
-        } else {
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
-                p += it.getType().price() * it.getNb() * d;
-            }
+        boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
+        for (int i = 0; i < b.getItems().length; i++) {
+            Item it = b.getItems()[i];
+            p += it.getType().price(discountPeriod) * it.getNb() * clientDiscout;
         }
 
         try {
@@ -59,18 +42,6 @@ public class ShoppingController {
         }
 
         return String.valueOf(p);
-    }
-
-    private boolean summerDiscountPeriod() {
-        return cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-            cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-            cal.get(Calendar.MONTH) == Calendar.JUNE;
-    }
-
-    private boolean winterDiscountPeriod() {
-        return cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-            cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-            cal.get(Calendar.MONTH) == Calendar.JANUARY;
     }
 }
 

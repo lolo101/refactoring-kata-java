@@ -1,17 +1,22 @@
 package com.sipios.refactoring.controller;
 
 public enum ItemType {
-    TSHIRT(30),
-    DRESS(50),
-    JACKET(100);
+    TSHIRT(30, 1.0),
+    DRESS(50, 0.8),
+    JACKET(100, 0.9);
 
-    private final int price;
+    private final double price;
+    private final double discount;
 
-    ItemType(int price) {
+    ItemType(double price, double discount) {
         this.price = price;
+        this.discount = discount;
     }
 
-    public double price() {
+    public double price(boolean discountPeriod) {
+        if (discountPeriod) {
+            return price * discount;
+        }
         return price;
     }
 }
