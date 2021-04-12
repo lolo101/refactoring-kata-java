@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import static com.sipios.refactoring.controller.ClientType.*;
+import static com.sipios.refactoring.controller.ItemType.*;
 
 @RestController
 @RequestMapping("/shopping")
@@ -31,6 +31,9 @@ public class ShoppingController {
         // Compute discount for customer
         double d = b.getType().discout();
 
+        if (b.getItems() == null) {
+            return "0";
+        }
         // Compute total amount depending on the types and quantity of product and
         // if we are in winter or summer discounts periods
         if (
@@ -45,37 +48,19 @@ public class ShoppingController {
                 cal.get(Calendar.MONTH) == 0
             )
         ) {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
             for (int i = 0; i < b.getItems().length; i++) {
                 Item it = b.getItems()[i];
-
-                if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * d;
-                } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * d;
-                } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * d;
-                }
-                // else if (it.getType().equals("SWEATSHIRT")) {
-                //     price += 80 * it.getNb();
-                // }
+                p += it.getType().price() * it.getNb() * d;
             }
         } else {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
             for (int i = 0; i < b.getItems().length; i++) {
                 Item it = b.getItems()[i];
 
-                if (it.getType().equals("TSHIRT")) {
+                if (it.getType() == TSHIRT) {
                     p += 30 * it.getNb() * d;
-                } else if (it.getType().equals("DRESS")) {
+                } else if (it.getType() == DRESS) {
                     p += 50 * it.getNb() * 0.8 * d;
-                } else if (it.getType().equals("JACKET")) {
+                } else if (it.getType() == JACKET) {
                     p += 100 * it.getNb() * 0.9 * d;
                 }
                 // else if (it.getType().equals("SWEATSHIRT")) {
@@ -125,21 +110,21 @@ class Body {
 
 class Item {
 
-    private String type;
+    private ItemType type;
     private int nb;
 
     public Item() {}
 
-    public Item(String type, int quantity) {
+    public Item(ItemType type, int quantity) {
         this.type = type;
         this.nb = quantity;
     }
 
-    public String getType() {
+    public ItemType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ItemType type) {
         this.type = type;
     }
 

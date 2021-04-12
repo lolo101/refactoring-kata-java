@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 
 import static com.sipios.refactoring.controller.ClientType.STANDARD_CUSTOMER;
+import static com.sipios.refactoring.controller.ItemType.JACKET;
 
 class ShoppingControllerTests extends UnitTest {
 
@@ -24,13 +25,13 @@ class ShoppingControllerTests extends UnitTest {
     @Test
     void should_throw_on_price_limit_exceeded() {
         Assertions.assertThrows(Exception.class,
-            () -> controller.getPrice(new Body(new Item[] {new Item("JACKET", 3)}, STANDARD_CUSTOMER))
+            () -> controller.getPrice(new Body(new Item[] {new Item(JACKET, 3)}, STANDARD_CUSTOMER))
         );
     }
 
     @ParameterizedTest
     @CsvSource({"STANDARD_CUSTOMER, 100.0", "PREMIUM_CUSTOMER, 90.0", "PLATINUM_CUSTOMER, 50.0"})
-    void should_return_dicounted_price(ClientType clientType, String dicountedPrice) {
-        Assertions.assertEquals(dicountedPrice, controller.getPrice(new Body(new Item[] {new Item("JACKET", 1)}, clientType)));
+    void should_return_discounted_price(ClientType clientType, String discountedPrice) {
+        Assertions.assertEquals(discountedPrice, controller.getPrice(new Body(new Item[] {new Item(JACKET, 1)}, clientType)));
     }
 }
