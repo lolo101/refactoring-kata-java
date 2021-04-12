@@ -1,17 +1,32 @@
 package com.sipios.refactoring.controller;
 
 public enum ClientType {
-    STANDARD_CUSTOMER(1.0),
-    PREMIUM_CUSTOMER(0.9),
-    PLATINUM_CUSTOMER(0.5);
+    STANDARD_CUSTOMER("standard customer", 1.0, 200),
+    PREMIUM_CUSTOMER("premium customer", 0.9, 500),
+    PLATINUM_CUSTOMER("platinum customer", 0.5, 2000);
 
+    private final String name;
     private final double discount;
+    private final double maximumPrice;
 
-    ClientType(double discount) {
+    ClientType(String name, double discount, double maximumPrice) {
+        this.name = name;
         this.discount = discount;
+        this.maximumPrice = maximumPrice;
     }
 
     public double discout() {
         return discount;
+    }
+
+    public void checkPriceLimit(double p) throws Exception {
+        if (p > maximumPrice) {
+            throw new Exception("Price (" + p + ") is too high for " + this);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

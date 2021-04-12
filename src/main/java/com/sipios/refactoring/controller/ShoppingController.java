@@ -85,23 +85,7 @@ public class ShoppingController {
         }
 
         try {
-            if (b.getType() == STANDARD_CUSTOMER) {
-                if (p > 200) {
-                    throw new Exception("Price (" + p + ") is too high for standard customer");
-                }
-            } else if (b.getType() == PREMIUM_CUSTOMER) {
-                if (p > 800) {
-                    throw new Exception("Price (" + p + ") is too high for premium customer");
-                }
-            } else if (b.getType() == PLATINUM_CUSTOMER) {
-                if (p > 2000) {
-                    throw new Exception("Price (" + p + ") is too high for platinum customer");
-                }
-            } else {
-                if (p > 200) {
-                    throw new Exception("Price (" + p + ") is too high for standard customer");
-                }
-            }
+            b.getType().checkPriceLimit(p);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
