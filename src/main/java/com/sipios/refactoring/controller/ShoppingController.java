@@ -26,7 +26,7 @@ public class ShoppingController {
             boolean discountPeriod = summerDiscountPeriod.isDiscountPeriod();
             double finalPrice = b.finalPrice(discountPeriod);
             return String.valueOf(finalPrice);
-        } catch (Exception e) {
+        } catch (PriceLimitException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -60,7 +60,7 @@ class Body {
         this.type = type;
     }
 
-    public double finalPrice(boolean discountPeriod) throws Exception {
+    public double finalPrice(boolean discountPeriod) throws PriceLimitException {
         double itemsPrice = itemsPrice(discountPeriod);
         double discountedPrice = type.applyDiscount(itemsPrice);
         type.checkPriceLimit(discountedPrice);

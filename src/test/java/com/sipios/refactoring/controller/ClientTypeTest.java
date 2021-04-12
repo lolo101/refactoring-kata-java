@@ -16,6 +16,7 @@ class ClientTypeTest {
     @CsvSource({"STANDARD_CUSTOMER, 201", "PREMIUM_CUSTOMER, 801", "PLATINUM_CUSTOMER, 2001"})
     void should_throw_on_excessive_price(ClientType clientType, double excessivePrice) {
         Assertions.assertThatThrownBy(() -> clientType.checkPriceLimit(excessivePrice))
+            .isInstanceOf(PriceLimitException.class)
             .hasMessageContaining("Price (" + excessivePrice + ") is too high");
     }
 }

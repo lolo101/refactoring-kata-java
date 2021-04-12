@@ -19,9 +19,9 @@ public enum ClientType {
         return itemsPrice * discount;
     }
 
-    public void checkPriceLimit(double p) throws Exception {
+    public void checkPriceLimit(double p) throws PriceLimitException {
         if (p > maximumPrice) {
-            throw new Exception("Price (" + p + ") is too high for " + this);
+            throw new PriceLimitException(this, p);
         }
     }
 

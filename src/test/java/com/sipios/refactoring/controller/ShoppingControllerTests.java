@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.web.server.ResponseStatusException;
 
 import static com.sipios.refactoring.controller.ClientType.STANDARD_CUSTOMER;
 import static com.sipios.refactoring.controller.ItemType.JACKET;
@@ -23,15 +24,13 @@ class ShoppingControllerTests extends UnitTest {
     @Test
     void should_not_throw() {
         Assertions.assertDoesNotThrow(
-            () -> controller.getPrice(new Body(new Item[]{}, STANDARD_CUSTOMER))
-        );
+            () -> controller.getPrice(new Body(new Item[]{}, STANDARD_CUSTOMER)));
     }
 
     @Test
     void should_throw_on_price_limit_exceeded() {
-        Assertions.assertThrows(Exception.class,
-            () -> controller.getPrice(new Body(new Item[]{new Item(JACKET, 3)}, STANDARD_CUSTOMER))
-        );
+        Assertions.assertThrows(ResponseStatusException.class,
+            () -> controller.getPrice(new Body(new Item[]{new Item(JACKET, 3)}, STANDARD_CUSTOMER)));
     }
 
     @ParameterizedTest
